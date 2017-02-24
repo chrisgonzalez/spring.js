@@ -40,6 +40,7 @@ class Spring {
         this._solution = null;
         this._endPosition = 0;
         this._startTime = 0;
+        this._onComplete = () => {};
     }
 
     get springConstant() {
@@ -48,6 +49,10 @@ class Spring {
 
     get damping() {
         return this._c;
+    }
+
+    set onComplete(func) {
+        this._onComplete = func;
     }
 
     get configuration() {
@@ -169,7 +174,11 @@ class Spring {
         this._k = springConstant;
         this._c = damping;
 
-        if (this.done()) return;
+        if (this.done()) {
+            this._onComplete();
+            return;
+        }
+
         this._solution = this.solve(this.x() - this._endPosition, this.dx());
         this._startTime = (new Date()).getTime();
     }
@@ -186,12 +195,17 @@ class Spring {
             if (!physicsModel.done() && !handle.cancelled) {
                 handle.id = requestAnimationFrame(onFrame.bind(null, handle, model, cb));
             }
+
+            if (physicsModel.done()) {
+                physicsModel._onComplete();
+            }
         }
         function cancel(handle) {
             if (handle && handle.id)
                 cancelAnimationFrame(handle.id);
             if (handle)
                 handle.cancelled = true;
+                return physicsModel.x();
         }
 
         var handle = { id: 0, cancelled: false };
