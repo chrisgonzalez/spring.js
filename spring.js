@@ -1,5 +1,9 @@
 /*
     NOTE: this is an ES6 port of the below copyrighted code!
+
+    Additions:
+        * included the animate function within the class itself
+        * onComplete handler for animation complete
 */
 
 /*
